@@ -2,10 +2,9 @@ const trycatch = require("../utils/TryCatch")
 const LoginModel = require("../Models/LoginModel")
 const PasswordResetModel = require("../Models/PasswordResetModel")
 const sendMail = require("../Service/MailService")
-const statuscode = require("../constant")
+const Status = require("../constant")
 const mongoose = require("mongoose")
 const { generateToken } = require("../utils/jwtHelper")
-const Constant = require("../constant")
 const TryCAtch = require("../utils/TryCatch")
 
 //@descr Sign up
@@ -22,10 +21,11 @@ const signup = trycatch(async (req, res) => {
 
         let result = await login.save();
         console.log("result: ", result);
-
-        return res.status(statuscode.SUCCESS).json({ "Success": "account created successfully", "message": result })
+        // return res.status(Status.SUCCESS).json({ "Success": "account created successfully", "message": result })
+        return res.Response(Status.SUCCESS, "signup successfully", result)
+    
     } catch (err) {
-        res.status(statuscode.NOT_FOUND)
+        res.status(Status.NOT_FOUND)
         throw err
     }
 })
@@ -38,17 +38,25 @@ const login = trycatch(async (req, res) => {
 
     const { email, password } = req.body;
     const login = await LoginModel.findOne({ email })
+    if(!login) {
+        res.status(Status.NOT_FOUND)
+        throw new Error("User not found")
+    }
     const token = generateToken({_id: login._id, user_type: login.user_type}, "7d")
     
     console.log(await login.isValidPassword(password))
     
     if (await login.isValidPassword(password)) {
-        console.log("Login: ", login)
+        // console.log("Login: ", login)
         req.session.userId = login._id
-        console.log("Session UserId: ", req.session.userId)
-        return res.status(statuscode.SUCCESS).json({ "Success": "login success", "message": login, "token": token })
+        // console.log("Session UserId: ", req.session.userId)
+        // return res.status(Status.SUCCESS).json({ "Success": "login success", "message": login, "token": token })
+        let userLogin = login.toJSON()
+        userLogin["token"] = token
+        // console.log(userLogin)
+        return res.Response(Status.SUCCESS, "login Successfully", userLogin)
     } else {
-        res.status(statuscode.UNAUTHORIZED)
+        res.status(Status.UNAUTHORIZED)
         throw new Error("Invalid username or password")
     }
 
@@ -62,13 +70,15 @@ const sessionLogin = TryCAtch( async(req, res)=> {
     const _id = req.session.userId;
     console.log(_id)
     if(!_id) {
-        res.status(statuscode.UNAUTHORIZED)
+        res.status(Status.UNAUTHORIZED)
         throw new Error("session expired")
     }
     const result = await LoginModel.findOne({_id})
     const token = generateToken({_id: login._id, user_type: login.user_type}, "7d")
-    return res.status(statuscode.SUCCESS).json({"Success": "Login successfully", "message": result, token})
-
+    let userLogin = result.toJSON()
+    userLogin["token"] = token
+    // return res.status(Status.SUCCESS).json({"Success": "Login successfully", "message": result, token})
+    res.Response(Status.SUCCESS, "Login successfully", userLogin)
 })
 
 
@@ -79,11 +89,12 @@ const sessionLogin = TryCAtch( async(req, res)=> {
 const sessionLogout = TryCAtch( async(req, res)=> {
     req.session.destroy( (error)=>{
         if(error) {
-            res.status(statuscode.SERVER_ERROR)
+            res.status(Status.SERVER_ERROR)
             throw new Error("Failed to logout")
         }
     })
-    return res.status(statuscode.SUCCESS).json({"Success": "Logout successfully"})
+    // return res.status(Status.SUCCESS).json({"Success": "Logout successfully"})
+    return res.Response(Status.SUCCESS, "Logout successfully")
 
 })
 
@@ -97,29 +108,30 @@ const passwordResetEmail = trycatch(async (req, res) => {
     try {
         const user = await LoginModel.findOne({ email })
         if (!user) {
-            res.status(statuscode.NOT_FOUND)
+            res.status(Status.NOT_FOUND)
             throw new Error("Email is not registerd one")
         }
         const reset_info = await PasswordResetModel.generateToken(email);
 
-        const url = `http://192.168.63.110:3000/account/auth/reset/${reset_info.token}`
+        const url = `${process.env.FRONT_IP}/account/auth/reset/${reset_info.token}`
 
         sendMail(reset_info?.email, url)
             .then(() => {
                 console.log("password reset: ", reset_info)
-                return res.status(statuscode.SUCCESS).json({ "Success": "check you email", "message": reset_info })
+                // return res.status(Status.SUCCESS).json({ "Success": "check you email", "message": reset_info })
+                return res.Response(Status.SUCCESS, "check your email")
             })
             .catch((error) => {
-                res.status(statuscode.NOT_FOUND)
+                res.status(Status.NOT_FOUND)
                 throw error;
             })
 
 
     } catch (error) {
-        if (res.statusCode == statuscode.SUCCESS) {
-            res.status(statuscode.NOT_FOUND)
+        if (res.Status == Status.SUCCESS) {
+            res.status(Status.NOT_FOUND)
         }
-        console.log(res.statusCode)
+        console.log(res.Status)
         throw error
     }
 })
@@ -135,7 +147,7 @@ const passwordReset = trycatch(async (req, res) => {
     const { token } = req.params
 
     if (password != confirm_password) {
-        res.status(statuscode.VALIDATION_ERROR)
+        res.status(Status.VALIDATION_ERROR)
         throw new Error(" password and confirm password are not same")
     }
 
@@ -146,10 +158,11 @@ const passwordReset = trycatch(async (req, res) => {
         update.password = password
         await update.save()
         console.log(update)
-        // console.log(statuscode.SUCCESS)
-        return res.status(statuscode.SUCCESS).json({ "Success": "Password Reset", "message": result })
+        // console.log(Status.SUCCESS)
+        // return res.status(Status.SUCCESS).json({ "Success": "Password Reset", "message": result })
+        return res.Response(Status.SUCCESS, "Password Reset Successfully")
     } catch (error) {
-        res.status(statuscode.VALIDATION_ERROR)
+        res.status(Status.VALIDATION_ERROR)
         throw error
     }
 })
@@ -176,16 +189,17 @@ const deleteUser = trycatch( async (req, res)=> {
         console.log(result) 
         
         if(!result) {
-            res.status(statuscode.NOT_FOUND)
+            res.status(Status.NOT_FOUND)
             throw new Error("User not found")
         }
-        return res.status(statuscode.SUCCESS).json({"Success": "Data deleted successfully", "message": result})
-
+        // return res.status(Status.SUCCESS).json({"Success": "Data deleted successfully", "message": result})
+        return res.Response(Status.SUCCESS, "Deleted successfully")
+        
     } catch(error) {
-        if (res.statusCode == statuscode.SUCCESS) {
-            res.status(statuscode.SERVER_ERROR)
+        if (res.Status == Status.SUCCESS) {
+            res.status(Status.SERVER_ERROR)
         }
-        console.log(res.statusCode)
+        console.log(res.Status)
         throw error;
     }
 })

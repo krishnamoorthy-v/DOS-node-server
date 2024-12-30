@@ -1,8 +1,8 @@
-const Constant = require("../constant")
+const Status = require("../constant")
 
 const errorHandler = (err, req, res, next) => {
 
-    const statuscode = res.statusCode ? res.statusCode : 500;
+    let statuscode = res.statusCode ? res.statusCode : 500;
 
     console.log(err.stack)
 
@@ -11,46 +11,47 @@ const errorHandler = (err, req, res, next) => {
 
     switch (statuscode) {
 
-        case Constant.VALIDATION_ERROR:
+        case Status.VALIDATION_ERROR:
 
             title = "Validation Failed"
             message = err.message.split(":")[err.message.split(":").length-1].trim()
 
             break;
 
-        case Constant.UNAUTHORIZED:
+        case Status.UNAUTHORIZED:
 
             title = "Unauthorized Access"
             message = err.message.split(":")[err.message.split(":").length-1].trim()
 
             break;
 
-        case Constant.NOT_FOUND:
+        case Status.NOT_FOUND:
 
             title = "Not Found"
             message = err.message.split(":")[err.message.split(":").length-1].trim()
 
             break;
 
-        case Constant.FORBIDDEN:
+        case Status.FORBIDDEN:
 
             title = "Forbidden"
             message = err.message.split(":")[err.message.split(":").length-1].trim()
 
             break;
 
-        case Constant.SERVER_ERROR:
+        case Status.SERVER_ERROR:
             title = "Server Error"
             message = err.message.split(":")[err.message.split(":").length-1].trim()
             break;
 
         default:
-            title = "Success"
-            message = "No Error, All good!";
+            statuscode = 500
+            title = "Server Error"
+            message = err.message;
             break
     }
 
-    return res.json({ title, message })
+    return res.errorResponse(statuscode, title, message)
 }
 
 module.exports = errorHandler

@@ -12,7 +12,7 @@ const MongoStore = require("connect-mongo")
 app = express()
 
 const PORT = process.env.PORT || 9000
-const IP = "192.168.89.1"
+const IP = process.env.IP
 const SESSIONKEY = process.env.SESSIONKEY;
 const DBURL = process.env.DBURL;
 
@@ -33,8 +33,30 @@ app.use(session({
         maxAge: 1000*60*60*24*7 // expire in 7 days
     }
 }))
+
+//log info --> url call and method
 app.use(logInfo)
 
+//Standardize the Success Response
+app.use( (req, res, next)=> {
+    res.Response = (status, message, result) => {
+        let info = {status, message}
+        if(result){
+            info = {status, message, result}
+        } 
+        res.json(info)
+    }
+    next();
+})
+
+//Standardize the Error Response
+app.use( (req, res, next)=> {
+    res.errorResponse = (status, title, message) => {
+        const info = {status, title, message}
+        res.json(info)
+    }
+    next();
+})
 
 
 app.use("/account", account);

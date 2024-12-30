@@ -1,7 +1,8 @@
 const TryCAtch = require("../utils/TryCatch")
 const StudentModel = require("../Models/StudentModel")
-const constant = require("../constant")
+const Status = require("../constant")
 const mongoose = require("mongoose")
+
 
 //@descr create student 
 //@route POST /create
@@ -18,10 +19,10 @@ const addStudent = TryCAtch(async (req, res) => {
         // console.log(student_info)
         let student = new StudentModel(student_info)
         const result = await student.save()
-        res.status(constant.SUCCESS).json({ "Success": "student added", "message": result })
-
+        // res.status(Status.SUCCESS).json({ "Success": "student added", "message": result })
+        return res.Response(Status.SUCCESS, "Student added successfully", result)
     } catch (error) {
-        res.status(constant.VALIDATION_ERROR)
+        res.status(Status.VALIDATION_ERROR)
         throw error
     }
 })
@@ -34,16 +35,16 @@ const getStudentById = TryCAtch(async (req, res, next) => {
 
     const { login_id } = req.params;
     if (!mongoose.Types.ObjectId.isValid(login_id)) {
-        res.status(constant.NOT_FOUND)
+        res.status(Status.NOT_FOUND)
         throw new Error("Invalid login Id")
     }
     const student = await StudentModel.findOne({ login: login_id }).populate("login")
     if (!student) {
-        res.status(constant.NOT_FOUND);
+        res.status(Status.NOT_FOUND);
         throw new Error("student info not exits for particular login id")
     }
-    return res.status(constant.SUCCESS).json({ "Success": "student info", "message": student })
-
+    // return res.status(Status.SUCCESS).json({ "Success": "student info", "message": student })
+    return res.Response(Status.SUCCESS, "Student info", student)
 })
 
 
@@ -66,11 +67,11 @@ const getStudentByEmail = TryCAtch(async (req, res, next) => {
     console.log(filtered)
 
     if (filtered.length == 0) {
-        res.status(constant.NOT_FOUND);
+        res.status(Status.NOT_FOUND);
         throw new Error("student info not exits for particular email id")
     }
-    return res.status(constant.SUCCESS).json({ "Success": "student info", "message": filtered })
-
+    // return res.status(Status.SUCCESS).json({ "Success": "student info", "message": filtered })
+    return res.Response(Status.SUCCESS, "Student info", filtered)
 })
 
 //@descr UPDATE Student by login id
@@ -87,7 +88,7 @@ const updateStudent = TryCAtch(async (req, res) => {
 
     console.log(login)
     if (!login) {
-        res.status(constant.UNAUTHORIZED)
+        res.status(Status.UNAUTHORIZED)
         throw new Error("Session expired ")
     }
 
@@ -99,7 +100,8 @@ const updateStudent = TryCAtch(async (req, res) => {
 
     console.log(updateInfo)
 
-    return res.status(constant.SUCCESS).json({ "Success": "user updated" })
+    // return res.status(Status.SUCCESS).json({ "Success": "user updated" })
+    return res.Response(Status.SUCCESS, "User updated")
 })
 
 //@descr DELETE Student by login id
@@ -110,18 +112,18 @@ const deleteOne = TryCAtch( async(req, res)=>{
 
     const {stud_id} = req.params 
     if (!mongoose.Types.ObjectId.isValid(stud_id)) {
-        res.status(constant.NOT_FOUND)
+        res.status(Status.NOT_FOUND)
         throw new Error("Invalid stud Id")
     }
 
     const status = await StudentModel.deleteOne({_id: stud_id})
     console.log(status)
     if(status.deletedCount == 0) {
-        res.status(constant.NOT_FOUND)
+        res.status(Status.NOT_FOUND)
         throw new Error("student id not exits")
     }
-    return res.status(constant.SUCCESS).json({"Success": "Deleted"})
-
+    // return res.status(Status.SUCCESS).json({"Success": "Deleted"})
+    return res.status(Status.SUCCESS, "Deleted Successfully")
 })
 
 
@@ -133,10 +135,12 @@ const getAllStudent = TryCAtch( async(req, res)=>{
 
     const students = await StudentModel.find()
     if(students.length == 0) {
-        res.status(constant.NOT_FOUND)
+        res.status(Status.NOT_FOUND)
         throw new Error("Students not found");
     }
-    return res.status(constant.SUCCESS).json({"Success": "All students retrieved", message: students})
+    // return res.status(Status.SUCCESS).json({"Success": "All students retrieved", message: students})
+    return res.status(Status.SUCCESS, "All students are retrieved", students)
+
 })
 
 
@@ -149,11 +153,11 @@ const getAllStudentDept = TryCAtch( async(req, res)=> {
     const {department} = req.params;
     const students = await StudentModel.find({department});
     if(students.length == 0) {
-        res.status(constant.NOT_FOUND)
+        res.status(Status.NOT_FOUND)
         throw new Error("Department not found")
     }
-    return res.status(constant.SUCCESS).json({"Success": "All student of dept are retrived", message: students})
-
+    // return res.status(Status.SUCCESS).json({"Success": "All student of dept are retrived", message: students})
+    return res.Status(Status.SUCCESS, "All student of dept are retrived", students)
 })
 
 module.exports = { addStudent, getStudentById, getStudentByEmail, updateStudent, deleteOne, getAllStudent, getAllStudentDept }
