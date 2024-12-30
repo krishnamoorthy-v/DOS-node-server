@@ -1,6 +1,6 @@
 
 const jwt = require("jsonwebtoken")
-const Constant = require("../constant")
+const Status = require("../constant")
 
 const secret_key = process.env.SECRETKEY
 
@@ -34,22 +34,22 @@ const authorize = (permission) => {
 
         // console.log(req.headers)
         if(!req?.headers?.authorization) {
-            res.status(Constant.UNAUTHORIZED)
+            res.status(Status.UNAUTHORIZED)
             throw new Error("Unauthorized access to the API")
         }
         const token = req?.headers?.authorization.split(" ")[1]
-        console.log(token)
+        // console.log(token)
         const obj = verfiyToken(token)
-        console.log("Object: ",obj)
+        // console.log("Object: ",obj)
         // console.log("roles: ", roles[obj.user_type].includes(permission))
       
         if(!roles[obj.user_type].includes(permission)) {
             
-            res.status(Constant.UNAUTHORIZED)
+            res.status(Status.UNAUTHORIZED)
             throw new Error("unauthroized access to the API")
         }
         req.body.auth_user_id = obj._id;
-
+        console.log("Authorzied :", obj.user_type)
         next()
     }
 }

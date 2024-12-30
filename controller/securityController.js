@@ -7,7 +7,7 @@ const mongoose = require("mongoose")
 //@route POST /create
 //@access public
 
-const addSecurity = TryCAtch( async(req, res, next)=>{
+const addSecurity = TryCAtch( async(req, res)=>{
 
     const {name, profile, login, primary_number, secondary_number} = req.body
     obj = {name, profile, login, primary_number, secondary_number}
@@ -27,4 +27,26 @@ const addSecurity = TryCAtch( async(req, res, next)=>{
     }
 })
 
-module.exports = {addSecurity}
+//@descr to get all Security info
+//@route POST /
+//@access public
+
+const getAllSecurity = TryCAtch( async(req, res)=> {
+
+    const result = await SecurityModel.find()
+    if(result.length == 0) {
+        res.status(Status.NOT_FOUND)
+        throw new Error("No user found")
+    }
+    res.Response(Status.SUCCESS, "Retrived Security info Succefully", result)
+})
+
+
+//@descr to get Security by email id
+//@route POST /
+//@access public
+
+const getByEmail = TryCAtch( async(req, res)=> {
+    
+})
+module.exports = {addSecurity, getAllSecurity}
