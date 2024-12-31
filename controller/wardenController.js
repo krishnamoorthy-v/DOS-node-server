@@ -1,13 +1,13 @@
 const TryCAtch = require("../utils/TryCatch")
 const Status = require("../constant")
-const SecurityModel = require("../Models/SecurityModel")
+const WardenModel = require("../Models/WardenModels")
 const mongoose = require("mongoose")
 
-//@descr create Security 
+//@descr create Warden 
 //@route POST /create
 //@access public
 
-const addSecurity = TryCAtch( async(req, res)=>{
+const addWarden = TryCAtch( async(req, res)=>{
 
     const {name, profile, login, primary_number, secondary_number} = req.body
     obj = {name, profile, login, primary_number, secondary_number}
@@ -18,36 +18,36 @@ const addSecurity = TryCAtch( async(req, res)=>{
             throw new Error("Invalid Login Id")
         }
         console.log(security_info)
-        const result = await SecurityModel(security_info)
+        const result = await WardenModel(security_info)
         await result.save()
-        return res.Response(Status.SUCCESS, "Security info added", result);
+        return res.Response(Status.SUCCESS, "Warden info added", result);
     } catch(error) {
         res.status(Status.VALIDATION_ERROR)
         throw error
     }
 })
 
-//@descr to get all Security info
+//@descr to get all Warden info
 //@route GET /readall
 //@access public
 
-const getAllSecurity = TryCAtch( async(req, res)=> {
+const getAllWarden = TryCAtch( async(req, res)=> {
 
-    const result = await SecurityModel.find()
+    const result = await WardenModel.find()
     if(result.length == 0) {
         res.status(Status.NOT_FOUND)
         throw new Error("No user found")
     }
-    res.Response(Status.SUCCESS, "Retrived Security info Succefully", result)
+    res.Response(Status.SUCCESS, "Retrived Warden info Successfully", result)
 })
 
 
 
-//@descr to get Security by session id
+//@descr to get Warden by session id
 //@route GET /read
 //@access public
 
-const getSecurity = TryCAtch( async(req, res)=> {
+const getWarden = TryCAtch( async(req, res)=> {
 
     // console.log(req.session)
     const login = req.session?.loginId;
@@ -56,20 +56,20 @@ const getSecurity = TryCAtch( async(req, res)=> {
         res.status(Status.NOT_FOUND)
         throw new Error("Session id not found")
     }
-    const result = await SecurityModel.findOne({login})
+    const result = await WardenModel.findOne({login})
     if(!result) {
         res.status(Status.NOT_FOUND)
         throw new Error("No user found")
     }
-    return res.Response(Status.SUCCESS, "Retrived Security info Successfully", result)
+    return res.Response(Status.SUCCESS, "Retrived Warden info Successfully", result)
 
 })
 
-//@descr to get Security by session id
+//@descr to get Warden by session id
 //@route GET /read/login/<id>
 //@access public
 
-const getSecurityByLoginId = TryCAtch( async(req, res)=> {
+const getWardenByLoginId = TryCAtch( async(req, res)=> {
 
     // console.log(req.session)
     const {loginId} = req.params
@@ -78,36 +78,36 @@ const getSecurityByLoginId = TryCAtch( async(req, res)=> {
         res.status(Status.VALIDATION_ERROR)
         throw new Error("Invalid login id")
     }
-    const result = await SecurityModel.findOne({login: loginId})
+    const result = await WardenModel.findOne({login: loginId})
     if(!result) {
         res.status(Status.NOT_FOUND)
         throw new Error("No user found")
     }
-    return res.Response(Status.SUCCESS, "Retrived Security info Successfully", result)
+    return res.Response(Status.SUCCESS, "Retrived Warden info Successfully", result)
 
 })
 
-//@descr to get Security by email id
+//@descr to get Warden by email id
 //@route GET /read/email/<email id>
 //@access public
 
-const getSecurityByEmail = TryCAtch( async(req, res)=>{
+const getWardenByEmail = TryCAtch( async(req, res)=>{
 
     const {email_id} = req.params;
-    const result = await SecurityModel.find().populate("login")
+    const result = await WardenModel.find().populate("login")
     filtered = result.filter( doc => doc.login && doc.login.email === email_id)
     if(filter.length == 0) {
         res.status(Status.NOT_FOUND)
         throw new Error("No user found")
     }
-    return res.Response(Status.SUCCESS, "Retrived Security info Successfully", filtered)
+    return res.Response(Status.SUCCESS, "Retrived Warden info Successfully", filtered)
 })
 
-//@descr to update Security by session id
+//@descr to update Warden by session id
 //@route UPDATE /update
 //@access public
 
-const updateSecurity = TryCAtch( async(req, res)=> {
+const updateWarden = TryCAtch( async(req, res)=> {
 
     const {name, profile, login, primary_number, secondary_number} = req.body
     obj = {name, profile, login, primary_number, secondary_number}
@@ -119,7 +119,7 @@ const updateSecurity = TryCAtch( async(req, res)=> {
         res.status(Status.NOT_FOUND)
         throw new Error("Session id not found")
     }
-    const result = await SecurityModel.updateOne({login: loginId}, {$set: security_info})
+    const result = await WardenModel.updateOne({login: loginId}, {$set: security_info})
     
     if(result.modifiedCount == 0) {
         res.status(Status.NOT_FOUND)
@@ -131,11 +131,11 @@ const updateSecurity = TryCAtch( async(req, res)=> {
 
 })
 
-//@descr to update Security by login id
+//@descr to update Warden by login id
 //@route UPDATE /update/login/<id>
 //@access public
 
-const updateSecurityByLoginId = TryCAtch( async(req, res)=> {
+const updateWardenByLoginId = TryCAtch( async(req, res)=> {
 
     const {name, profile, login, primary_number, secondary_number} = req.body
     obj = {name, profile, login, primary_number, secondary_number}
@@ -146,7 +146,7 @@ const updateSecurityByLoginId = TryCAtch( async(req, res)=> {
         res.status(Status.VALIDATION_ERROR)
         throw new Error("Invalid login id")
     }
-    const result = await SecurityModel.updateOne(
+    const result = await WardenModel.updateOne(
         {login: loginId}, 
         {$set: security_info},
         {runValidators: true }
@@ -160,34 +160,34 @@ const updateSecurityByLoginId = TryCAtch( async(req, res)=> {
 
 })
 
-//@descr to UPDATE Security by email id
+//@descr to UPDATE Warden by email id
 //@route UPDATE /update/email/<email-id>
 //@access public
 
-const updateSecurityByEmail = TryCAtch( async(req, res)=>{
+const updateWardenByEmail = TryCAtch( async(req, res)=>{
 
     const {name, profile, login, primary_number, secondary_number} = req.body
     obj = {name, profile, login, primary_number, secondary_number}
     const security_info = Object.fromEntries(Object.entries(obj).filter(([key, value]) => { if (value != undefined) return key }))
 
     const {email} = req.params;
-    const result = await SecurityModel.find().populate("login")
+    const result = await WardenModel.find().populate("login")
     
     const filtered = result.filter( doc => doc.login && doc.login.email === email)
     if(filtered.length == 0) {
         res.status(Status.NOT_FOUND)
         throw new Error("No user found")
     }
-    await SecurityModel.updateOne({_id: filtered._id}, {$set: {security_info}})
+    await WardenModel.updateOne({_id: filtered._id}, {$set: {security_info}})
     return res.Response(Status.SUCCESS, "Data Updated")
     
 })
 
-//@descr to DELETE Security by session id
+//@descr to DELETE Warden by session id
 //@route DELETE /delete
 //@access public
 
-const deleteSecurity = TryCAtch( async(req, res)=> {
+const deleteWarden = TryCAtch( async(req, res)=> {
 
     const {loginId} = req.session.loginId;
     if(!loginId) {
@@ -195,7 +195,7 @@ const deleteSecurity = TryCAtch( async(req, res)=> {
         throw new Error("Session id not found")
     }
 
-    const result = await SecurityModel.deleteOne({login: loginId})
+    const result = await WardenModel.deleteOne({login: loginId})
     if(result.length == 0) {
         res.status(Status.NOT_FOUND)
         throw new Error("No user Found")
@@ -203,11 +203,11 @@ const deleteSecurity = TryCAtch( async(req, res)=> {
     return res.Response(Status.SUCCESS, "Data Deleted")
 })
 
-//@descr to DELETE Security by login id
+//@descr to DELETE Warden by login id
 //@route DELETE /delete/login/<id>
 //@access public
 
-const deleteSecurityByLoginId = TryCAtch( async(req, res)=> {
+const deleteWardenByLoginId = TryCAtch( async(req, res)=> {
 
     const {loginId} = req.params;
     if(!mongoose.Types.ObjectId.isValid(loginId)) {
@@ -215,7 +215,7 @@ const deleteSecurityByLoginId = TryCAtch( async(req, res)=> {
         throw new Error("Invalid login id")
     }
 
-    const result = await SecurityModel.deleteOne({login: loginId})
+    const result = await WardenModel.deleteOne({login: loginId})
     if(result.length == 0) {
         res.status(Status.NOT_FOUND)
         throw new Error("No user Found")
@@ -225,4 +225,4 @@ const deleteSecurityByLoginId = TryCAtch( async(req, res)=> {
 
 
 
-module.exports = {addSecurity, getAllSecurity, getSecurity, getSecurityByLoginId, updateSecurity, updateSecurityByLoginId, deleteSecurityByLoginId}
+module.exports = {addWarden, getAllWarden, getWarden, getWardenByLoginId, updateWarden, updateWardenByLoginId, deleteWardenByLoginId}

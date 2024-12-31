@@ -6,6 +6,7 @@ const errorHandler = require("./middleware/errorHandlers")
 const account = require("./routes/account")
 const student = require("./routes/student")
 const security = require("./routes/security")
+const warden = require("./routes/warden")
 const logInfo = require("./middleware/log")
 const session = require("express-session")
 const MongoStore = require("connect-mongo")
@@ -64,6 +65,7 @@ app.use( (req, res, next)=> {
 app.use("/account", account);
 app.use("/student", student);
 app.use("/security", security);
+app.use("/warden", warden)
 app.use(errorHandler)
 
 

@@ -48,8 +48,8 @@ const login = trycatch(async (req, res) => {
     
     if (await login.isValidPassword(password)) {
         // console.log("Login: ", login)
-        req.session.userId = login._id
-        // console.log("Session UserId: ", req.session.userId)
+        req.session.loginId = login._id
+        // console.log("Session loginId: ", req.session.loginId)
         // return res.status(Status.SUCCESS).json({ "Success": "login success", "message": login, "token": token })
         let userLogin = login.toJSON()
         userLogin["token"] = token
@@ -67,7 +67,7 @@ const login = trycatch(async (req, res) => {
 //@route GET /login
 //@access public
 const sessionLogin = TryCAtch( async(req, res)=> {
-    const _id = req.session.userId;
+    const _id = req.session.loginId;
     console.log(_id)
     if(!_id) {
         res.status(Status.UNAUTHORIZED)
@@ -169,22 +169,22 @@ const passwordReset = trycatch(async (req, res) => {
 
 
 //@descr delete the user based on the user id
-//@route POST delete/user/:userid
+//@route POST delete/user/:loginId
 //@access delete
 
 const deleteUser = trycatch( async (req, res)=> {
 
-    const {userid} = req.params 
+    const {loginId} = req.params 
     try {
         
 
         // to check the user id and auth id are same to authorize
-        if(userid != req.body.auth_user_id) {
+        if(loginId != req.body.auth_user_id) {
             res.status(Constant.UNAUTHORIZED)
             throw new Error("Unauthorized access of auth id and login id")
         }
         
-        const result = await LoginModel.deleteOne({_id: userid})
+        const result = await LoginModel.deleteOne({_id: loginId})
 
         console.log(result) 
         

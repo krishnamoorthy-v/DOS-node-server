@@ -12,7 +12,7 @@ const addStudent = TryCAtch(async (req, res) => {
 
     const { name, mobile, profile, department, parent_name, parent_mobile, guardian_name, guardian_mobile, home_addr } = req.body
     const obj = { name, mobile, profile, department, parent_name, parent_mobile, guardian_name, guardian_mobile, home_addr }
-    obj.login = req.session.userId;
+    obj.login = req.session.loginId;
     const student_info = Object.fromEntries(Object.entries(obj).filter(([key, value]) => { if (value != undefined) return key }))
 
     try {
@@ -20,12 +20,33 @@ const addStudent = TryCAtch(async (req, res) => {
         let student = new StudentModel(student_info)
         const result = await student.save()
         // res.status(Status.SUCCESS).json({ "Success": "student added", "message": result })
-        return res.Response(Status.SUCCESS, "Student added successfully", result)
+        return res.Response(Status.SUCCESS, "Student added Successfully.", result)
     } catch (error) {
         res.status(Status.VALIDATION_ERROR)
         throw error
     }
 })
+
+
+//@descr get student info based on session id
+//@route GET /get
+//@access public
+
+const getStudent = TryCAtch(async (req, res) => {
+
+    const login_id = req.session.loginId;
+
+    const student = await StudentModel.findOne({ login: login_id }).populate("login")
+    if (!student) {
+        res.status(Status.NOT_FOUND);
+        throw new Error("student info not exits for particular login id")
+    }
+    // return res.status(Status.SUCCESS).json({ "Success": "student info", "message": student })
+    return res.Response(Status.SUCCESS, "Student info", student)
+})
+
+
+
 
 //@descr get student info based on login id
 //@route GET /get/id/<login id>
@@ -157,7 +178,7 @@ const updateStudentBySession = TryCAtch(async (req, res) => {
     const obj = { name, mobile, profile, department, parent_name, parent_mobile, guardian_name, guardian_mobile, home_addr }
     const student_info = Object.fromEntries(Object.entries(obj).filter(([key, value]) => { if (value != undefined) return key }))
 
-    const login = req.session.userId
+    const login = req.session.loginId
 
     console.log(login)
     if (!login) {
@@ -165,16 +186,21 @@ const updateStudentBySession = TryCAtch(async (req, res) => {
         throw new Error("Session expired ")
     }
 
-    const updateInfo = await StudentModel.updateOne(
-        { login },
-        { $set: student_info },
-        { new: true, runValidators: true }
-    );
+    try {
+        const updateInfo = await StudentModel.updateOne(
+            { login },
+            { $set: student_info },
+            { new: true, runValidators: true }
+        );
 
-    console.log(updateInfo)
+        console.log(updateInfo)
 
-    // return res.status(Status.SUCCESS).json({ "Success": "user updated" })
-    return res.Response(Status.SUCCESS, "User updated")
+        // return res.status(Status.SUCCESS).json({ "Success": "user updated" })
+        return res.Response(Status.SUCCESS, "User updated")
+    } catch (error) {
+        res.status(Status.VALIDATION_ERROR)
+        throw error
+    }
 })
 
 //@descr DELETE Student by login id
@@ -196,10 +222,10 @@ const deleteOne = TryCAtch(async (req, res) => {
         throw new Error("student id not exits")
     }
     // return res.status(Status.SUCCESS).json({"Success": "Deleted"})
-    return res.Response(Status.SUCCESS, "Deleted Successfully")
+    return res.Response(Status.SUCCESS, "Deleted Successfully.")
 })
 
 
 
 
-module.exports = { addStudent, getStudentById, getStudentByEmail, updateStudent, deleteOne, getAllStudent, getAllStudentDept, updateStudentBySession }
+module.exports = { addStudent, getStudentById, getStudentByEmail, updateStudent, deleteOne, getAllStudent, getAllStudentDept, updateStudentBySession, getStudent }

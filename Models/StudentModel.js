@@ -22,7 +22,7 @@ student_schema = mongoose.Schema({
                     throw new Error("Referenced login id not exits")
                 }
 
-                if (login.user_type != "security") {
+                if (login.user_type != "student") {
                     throw new Error("Referenced Login_user type is not a Student")
                 }
             }
