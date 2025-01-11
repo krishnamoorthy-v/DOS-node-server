@@ -1,12 +1,13 @@
 const mongoose = require("mongoose")
-const { validate } = require("./PasswordResetModel")
+const settings = require("../settings")
 
 transaction_schema = mongoose.Schema({
 
-    reason: { type: String },
+    reason: { type: String, required:[true, "reason required"], trim: true},
     status: { type: String, enum: ["Pending", "Accepted", "Rejected", "Check_In", "Check_Out", "Completed", "Expired"], default: "Pending" },
     out_time: { 
         type: Date, 
+        required: [true, "out time required"],
         validate: {
             validator: async function(value) {
                 if( new Date(value).getTime() < (new Date().getTime() - 1000 * 60 ) ) {
@@ -17,6 +18,7 @@ transaction_schema = mongoose.Schema({
     },
     in_time: { 
         type: Date,
+        required: [true, "in time required"],
         validate: {
             validator: async function(value) {
                 if( new Date(value).getTime() <= (new Date(this.out_time).getTime() ) ) {
@@ -45,8 +47,6 @@ transaction_schema = mongoose.Schema({
             }
         }
     },
-    token_expire: { type: Date },
-    qr_code_base_64: { type: String },
     login: {
         type: mongoose.Types.ObjectId,
         ref: "LoginModel",
@@ -63,6 +63,27 @@ transaction_schema = mongoose.Schema({
         }
     }
 
+}, {
+    timestamps: true
 })
 
+transaction_schema.query.countDailyPass = async function() {
+    // console.log(this.getQuery().login)
+    const date = new Date()
+    const startOfDay = new Date(date.setHours(0, 0, 0, 0))
+    const endOfDay = new Date(date.setHours(23, 59, 59, 999))
+    // console.log(startOfDay, " ", endOfDay)
+    return await this.model.aggregate([
+        {
+            $match: {login: this.getQuery().login, createdAt: {$gte: startOfDay, $lte: endOfDay} }
+        },
+        {
+            $group: {_id: "$login", count: {$count: {}}}
+        }
+    ])
+}
+
+
 TransactionModel = mongoose.model("TransactionModel", transaction_schema)
+
+module.exports = TransactionModel

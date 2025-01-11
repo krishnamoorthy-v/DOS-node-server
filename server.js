@@ -24,11 +24,12 @@ mongoose.connect(DBURL)
 .then( res => console.log("Connected to mongodb successfully"))
 .catch( error => console.log("Error while connecting to db"))
 
-
-
+console.log(__dirname)
+console.log(__filename)
 app.use(express.json())
 app.use(cors())
 app.use(session({
+
     secret: SESSIONKEY,
     resave: false,
     saveUninitialized: false,
@@ -68,6 +69,10 @@ app.use("/student", student);
 app.use("/security", security);
 app.use("/warden", warden);
 app.use("/transaction", transaction);
+
+// app.use("/*", (req, res)=> {
+//     res.send(`url not found --> ${req.method}: ${req.url}`)
+// })
 
 app.use(errorHandler)
 

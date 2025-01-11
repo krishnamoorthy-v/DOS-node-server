@@ -47,7 +47,7 @@ const errorHandler = (err, req, res, next) => {
         default:
             statuscode = 500
             title = "Server Error"
-            message = err.message;
+            message = err.message.split(":")[err.message.split(":").length-1].trim();
             break
     }
 
