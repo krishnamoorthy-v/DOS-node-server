@@ -1,10 +1,11 @@
 const express = require("express")
-const {addStudent, getStudentById, getStudentByEmail, updateStudent, deleteOne, getStudent, getAllStudent, getAllStudentDept, updateStudentBySession} = require("../controller/studentController")
+const {addStudent, addExcelStudent, getStudentById, getStudentByEmail, updateStudent, deleteOne, getStudent, getAllStudent, getAllStudentDept, updateStudentBySession} = require("../controller/studentController")
 const { authorize } = require("../utils/jwtHelper")
 
 const student = express.Router()
 
 student.post("/create",  addStudent)
+student.post("/createAll", addExcelStudent)
 
 student.get("/read", getStudent)
 student.get("/get/id/:login_id", getStudentById)
