@@ -1,5 +1,6 @@
 const TryCAtch = require("../utils/TryCatch")
 const StudentModel = require("../Models/StudentModel")
+const studenExcelValidator = require("../Validator/studentExcelInfo")
 const Status = require("../constant")
 const mongoose = require("mongoose")
 
@@ -25,6 +26,40 @@ const addStudent = TryCAtch(async (req, res) => {
         res.status(Status.VALIDATION_ERROR)
         throw error
     }
+})
+
+
+const addExcelStudent = TryCAtch( async(req, res)=> {
+    
+    const info = req.body;
+
+    try {
+        const errors = await studenExcelValidator.listOfStudent(info?.students);
+        console.log("errors: ", errors)
+        if(errors.length > 0) {
+            res.status(Status.VALIDATION_ERROR)
+            throw new Error(errors)
+        }
+        info.students.forEach( async (ele, index)=> {
+            
+            const login = new LoginModel(ele)
+            await login.save()
+            ele.login = login._id
+
+            StudentModel.create(ele)
+            .then( res => console.log("student info created ", res))
+            .catch( err => {
+                res.status(Status.VALIDATION_ERROR)
+                throw err;
+            })
+        })
+        return res.Response(Status.SUCCESS, "Students info added Successfully.")
+
+    } catch(error) {
+        res.status(Status.SERVER_ERROR)
+        throw error
+    }
+
 })
 
 
@@ -228,4 +263,4 @@ const deleteOne = TryCAtch(async (req, res) => {
 
 
 
-module.exports = { addStudent, getStudentById, getStudentByEmail, updateStudent, deleteOne, getAllStudent, getAllStudentDept, updateStudentBySession, getStudent }
+module.exports = { addStudent, addExcelStudent, getStudentById, getStudentByEmail, updateStudent, deleteOne, getAllStudent, getAllStudentDept, updateStudentBySession, getStudent }
