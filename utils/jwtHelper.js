@@ -7,8 +7,8 @@ const secret_key = process.env.SECRETKEY
 const roles = {
 
     "admin": ["create", "read", "update", "delete", "readall"],
-    "security":["read", "readall"],
-    "warden": ["read", "readall"],
+    "security":["read", "readall", "security"],
+    "warden": ["read", "readall", "warden"],
     "student": ["read"],
 
 }
