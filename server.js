@@ -26,8 +26,11 @@ mongoose.connect(DBURL)
 
 console.log(__dirname)
 console.log(__filename)
-app.use(express.json())
-app.use(cors())
+app.use(express.json({limit: "5mb"}))
+app.use(cors({
+    origin: true,
+    credentials: true,
+}))
 app.use(session({
 
     secret: SESSIONKEY,
@@ -35,9 +38,17 @@ app.use(session({
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: DBURL, collectionName: "sessions"}),
     cookie: {
+        secure: false,
+        httpOnly: true,
+        // sameSite: "None",
         maxAge: 1000*60*60*24*7 // expire in 7 days
     }
 }))
+
+app.use( (req, res, next) => {
+    console.log("session: ", req?.session?.loginId)
+    next();
+})
 
 //log info --> url call and method
 app.use(logInfo)

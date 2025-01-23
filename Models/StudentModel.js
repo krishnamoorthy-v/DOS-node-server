@@ -1,6 +1,6 @@
 const mongoose = require("mongoose")
 const DefaultValue = require("../utils/DefaultValue")
-student_schema = mongoose.Schema({
+student_schema = new mongoose.Schema({
 
     name: { type: String, required: [true, "name requried"] },
     mobile: { type: String, required: [true, "Parent mobile number required"], unique: [true, "mobile number must be unique"], match: [/^[6-9]\d{9}$/, "Invalid mobile number"] },

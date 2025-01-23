@@ -1,7 +1,55 @@
 const TryCAtch = require("../utils/TryCatch")
 const Status = require("../constant")
 const SecurityModel = require("../Models/SecurityModel")
+const LoginModel = require("../Models/LoginModel")
 const mongoose = require("mongoose")
+
+
+//@descr create Security login with profile info
+//@route POST /createAccount
+//@access private
+
+const createAccount = TryCAtch(async (req, res) => {
+    const { email, password, name, profile, primary_number, secondary_number } =
+      req.body;
+    // console.log( {email, username, password, is_active, user_type} )
+    obj = { name, profile, primary_number, secondary_number };
+    const security_info = Object.fromEntries(
+      Object.entries(obj).filter(([key, value]) => {
+        if (value != undefined) return key;
+      })
+    );
+  
+    const loginInfo = new LoginModel({ email, password, user_type: "security" });
+    try {
+      let result = await loginInfo.save();
+  
+      login = result._id;
+  
+      console.log(security_info);
+      const security_result = await SecurityModel({ ...security_info, login });
+      try {
+        await security_result.save();
+      } catch (err) {
+        await LoginModel.deleteOne({ _id: login });
+        res.status(Status.NOT_FOUND);
+        throw err;
+      }
+  
+      console.log("result: ", security_result);
+      // return res.status(Status.SUCCESS).json({ "Success": "account created successfully", "message": result })
+      return res.Response(Status.SUCCESS, "security info added", {
+        email: result.email,
+        is_active: result.is_active,
+        user_type: result.user_type,
+        login_id: result._id,
+        ...security_result._doc,
+      });
+    } catch (err) {
+      res.status(Status.NOT_FOUND);
+      throw err;
+    }
+  });
 
 //@descr create Security 
 //@route POST /create
@@ -225,4 +273,4 @@ const deleteSecurityByLoginId = TryCAtch( async(req, res)=> {
 
 
 
-module.exports = {addSecurity, getAllSecurity, getSecurity, getSecurityByLoginId, updateSecurity, updateSecurityByLoginId, deleteSecurityByLoginId}
+module.exports = {createAccount, addSecurity, getAllSecurity, getSecurity, getSecurityByLoginId, updateSecurity, updateSecurityByLoginId, deleteSecurityByLoginId}

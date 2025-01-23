@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const settings = require("../settings")
 
-transaction_schema = mongoose.Schema({
+transaction_schema = new mongoose.Schema({
 
     reason: { type: String, required:[true, "reason required"], trim: true},
     status: { type: String, enum: ["Pending", "Accepted", "Rejected", "Check_In", "Check_Out", "Completed", "Expired"], default: "Pending" },

@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const { generateCryptoToken } = require("../utils/TokenUtils")
 
-reset_schema = mongoose.Schema({
+reset_schema = new mongoose.Schema({
 
     email: { type: String, unique: [true, "email id already exits"], required: true, match: [/^[a-zA-Z0-9]+@[a-zA-Z]+\.[a-zA-Z.]{2,}$/, "invalid email id"] },
     token: { type: String }

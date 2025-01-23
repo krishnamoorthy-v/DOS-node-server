@@ -1,11 +1,12 @@
 const express = require("express")
 const {authorize} = require("../utils/jwtHelper")
-const {addWarden, getAllWarden, getWarden, getWardenByLoginId, updateWarden, updateWardenByLoginId, deleteWardenByLoginId} = require("../controller/wardenController")
+const {createAccount, addWarden, getAllWarden, getWarden, getWardenByLoginId, updateWarden, updateWardenByLoginId, deleteWardenByLoginId} = require("../controller/wardenController")
 
 
 warden = express.Router()
 
 warden.post("/create", addWarden )
+warden.post("/createAccount", createAccount)
 
 warden.get("/readall", authorize("readall"), getAllWarden)
 warden.get("/read", getWarden)

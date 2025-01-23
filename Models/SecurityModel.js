@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const Default = require("../utils/DefaultValue")
 
-security_schema = mongoose.Schema({
+security_schema = new mongoose.Schema({
 
     profile: { type: String, default: Default.profileImage() },
     name: { type: String },

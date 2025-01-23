@@ -1,7 +1,7 @@
 const mongoose = require("mongoose")
 const bcrypt = require("bcrypt")
 
-login_schema = mongoose.Schema( {
+login_schema = new mongoose.Schema( {
 
     email: {type: String, required: [true, "email id required"], unique: [true, "Email id alredy exits"], match: [/^[a-zA-Z0-9]+@[a-zA-Z]+\.[a-zA-Z.]{2,}$/, "invalid email id"]},
     password: {type: String, required: [true, "password requried"]},
