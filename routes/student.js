@@ -17,7 +17,7 @@ student.get("/getall/:department", authorize("readall"), getAllStudentDept)
 student.put("/update", updateStudentBySession)
 student.put("/update/:email_id", updateStudent)
 
-student.delete("/delete/:stud_id", authorize("delete"), deleteOne)
+student.delete("/delete/:loginId", authorize("delete"), deleteOne)
 
 
 module.exports = student

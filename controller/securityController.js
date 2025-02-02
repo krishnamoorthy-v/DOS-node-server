@@ -264,7 +264,9 @@ const deleteSecurityByLoginId = TryCAtch( async(req, res)=> {
     }
 
     const result = await SecurityModel.deleteOne({login: loginId})
-    if(result.length == 0) {
+     await LoginModel.deleteOne({ _id: loginId})
+    console.log(result)
+    if(result.deletedCount == 0) {
         res.status(Status.NOT_FOUND)
         throw new Error("No user Found")
     }

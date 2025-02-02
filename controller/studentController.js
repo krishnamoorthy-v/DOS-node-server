@@ -244,13 +244,14 @@ const updateStudentBySession = TryCAtch(async (req, res) => {
 
 const deleteOne = TryCAtch(async (req, res) => {
 
-    const { stud_id } = req.params
-    if (!mongoose.Types.ObjectId.isValid(stud_id)) {
+    const { loginId } = req.params
+    if (!mongoose.Types.ObjectId.isValid(loginId)) {
         res.status(Status.NOT_FOUND)
         throw new Error("Invalid stud Id")
     }
 
-    const status = await StudentModel.deleteOne({ _id: stud_id })
+    const status = await StudentModel.deleteOne({ login: loginId })
+    await LoginModel.deleteOne({_id: loginId})
     console.log(status)
     if (status.deletedCount == 0) {
         res.status(Status.NOT_FOUND)

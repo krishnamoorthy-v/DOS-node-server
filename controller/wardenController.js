@@ -275,6 +275,7 @@ const deleteWarden = TryCAtch(async (req, res) => {
 //@access public
 
 const deleteWardenByLoginId = TryCAtch(async (req, res) => {
+
   const { loginId } = req.params;
   if (!mongoose.Types.ObjectId.isValid(loginId)) {
     res.status(Status.VALIDATION_ERROR);
@@ -282,7 +283,10 @@ const deleteWardenByLoginId = TryCAtch(async (req, res) => {
   }
 
   const result = await WardenModel.deleteOne({ login: loginId });
-  if (result.length == 0) {
+  await LoginModel.deleteOne({ _id: loginId})
+  // console.log(result)
+  // console.log(result.deletedCount == 0)
+  if (result.deletedCount == 0) {
     res.status(Status.NOT_FOUND);
     throw new Error("No user Found");
   }
