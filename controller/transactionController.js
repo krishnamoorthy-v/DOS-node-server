@@ -63,12 +63,12 @@ const getOneStudAllTran = TryCAtch(async (req, res) => {
   }
 
   let result = await TransactionModel.find({ login });
-
-  if (status) {
+  console.log(result)
+  if (status === "Live") {
+    result = result.filter((doc) => doc.status && ["Accepted", "Check_Out"].includes(doc.status))
+  } else if (status) {
     result = result.filter((doc) => doc.status && doc.status == status);
-  }
-
-  // console.log(result)
+  } 
 
   result = result.map((doc) => {
     doc = doc.toObject();
