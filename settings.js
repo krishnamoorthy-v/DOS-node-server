@@ -1,5 +1,5 @@
 let appConfig = {
-    outpasslimit: 10,
+    outpasslimit: 1,
     outpassCheckOutExpireLimit: "1m",
     outpassCheckInExpireLimit: "40d",
 }
