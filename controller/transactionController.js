@@ -6,7 +6,7 @@ const mongoose = require("mongoose");
 const generateQRCode = require("../Service/QRService");
 const { generateToken, verfiyToken } = require("../utils/jwtHelper");
 const StudentModel = require("../Models/StudentModel");
-
+const momenttz = require("moment-timezone")
 //@descr to create Transaction
 //@route POST /create
 //@access public
@@ -42,8 +42,8 @@ const createTransaction = TryCAtch(async (req, res) => {
   let result = await transaction.save();
 
   result = result.toObject();
-  result.in_time = new Date(result.in_time).toLocaleString();
-  result.out_time = new Date(result.out_time).toLocaleString();
+  result.in_time = momenttz.utc(new Date(result.in_time), "Asia\Kolkata").format("DD/MM/YYYY hh:mm A")
+  result.out_time = momenttz.utc(new Date(result.out_time), "Asia\Kolkata").format("DD/MM/YYYY hh:mm A")
   // console.log( new Date(result.in_time).toLocaleString())
 
   res.Response(Status.SUCCESS, "transaction create", result);
