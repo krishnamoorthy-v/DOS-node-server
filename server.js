@@ -16,7 +16,7 @@ const MongoStore = require("connect-mongo")
 app = express()
 
 const PORT = process.env.PORT || 9000
-const IP = process.env.IP
+// const IP = process.env.IP
 const SESSIONKEY = process.env.SESSIONKEY;
 const DBURL = process.env.DBURL;
 
@@ -25,7 +25,7 @@ mongoose.connect(DBURL, {
     socketTimeoutMS: 45000,
 })
 .then( res => console.log("Connected to mongodb successfully"))
-.catch( error => console.log("Error while connecting to db"))
+.catch( error => console.log("Error while connecting to db ", error))
 
 console.log(__dirname)
 console.log(__filename)
@@ -91,6 +91,6 @@ app.use("/transaction", transaction);
 app.use(errorHandler)
 
 
-app.listen(PORT, IP, ()=>{
-    console.log(`Server Running on ${IP}:${PORT}`)
+app.listen(PORT, ()=>{
+    console.log(`Server Running on :${PORT}`)
 })
