@@ -27,10 +27,10 @@ mongoose.connect(DBURL, {
 .then( res => console.log("Connected to mongodb successfully"))
 .catch( error => console.log("Error while connecting to db ", error))
 
-
+app.set("trust proxy", 1); // Trust first proxy
 app.use(express.json({limit: "5mb"}))
 app.use(cors({
-    origin: true,
+    origin: "https://digital-outpass-system.netlify.app",
     credentials: true,
 }))
 app.use(session({
