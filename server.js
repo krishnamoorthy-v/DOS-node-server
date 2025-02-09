@@ -27,8 +27,7 @@ mongoose.connect(DBURL, {
 .then( res => console.log("Connected to mongodb successfully"))
 .catch( error => console.log("Error while connecting to db ", error))
 
-console.log(__dirname)
-console.log(__filename)
+
 app.use(express.json({limit: "5mb"}))
 app.use(cors({
     origin: true,
