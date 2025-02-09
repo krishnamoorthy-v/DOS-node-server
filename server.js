@@ -20,7 +20,10 @@ const IP = process.env.IP
 const SESSIONKEY = process.env.SESSIONKEY;
 const DBURL = process.env.DBURL;
 
-mongoose.connect(DBURL)
+mongoose.connect(DBURL, {
+    serverSelectionTimeoutMS: 10000,
+    socketTimeoutMS: 45000,
+})
 .then( res => console.log("Connected to mongodb successfully"))
 .catch( error => console.log("Error while connecting to db"))
 

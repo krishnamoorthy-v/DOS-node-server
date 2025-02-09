@@ -20,7 +20,7 @@ const signup = trycatch(async (req, res) => {
     try {
 
         let result = await login.save();
-        console.log("result: ", result);
+        // console.log("result: ", result);
         // return res.status(Status.SUCCESS).json({ "Success": "account created successfully", "message": result })
         return res.Response(Status.SUCCESS, "signup successfully", result)
     
@@ -68,7 +68,7 @@ const login = trycatch(async (req, res) => {
 //@access public
 const sessionLogin = TryCAtch( async(req, res)=> {
     const _id = req.session.loginId;
-    console.log(_id)
+    // console.log(_id)
     if(!_id) {
         res.status(Status.UNAUTHORIZED)
         throw new Error("session expired")
@@ -117,7 +117,7 @@ const passwordResetEmail = trycatch(async (req, res) => {
 
         sendMail(reset_info?.email, url)
             .then(() => {
-                console.log("password reset: ", reset_info)
+                // console.log("password reset: ", reset_info)
                 // return res.status(Status.SUCCESS).json({ "Success": "check you email", "message": reset_info })
                 return res.Response(Status.SUCCESS, "check your email")
             })
