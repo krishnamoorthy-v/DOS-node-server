@@ -113,7 +113,7 @@ const passwordResetEmail = trycatch(async (req, res) => {
         }
         const reset_info = await PasswordResetModel.generateToken(email);
 
-        const url = `${process.env.FRONT_IP}/account/auth/reset/${reset_info.token}`
+        const url = `${process.env.FRONT_IP}/account/auth/reset/?token=${reset_info.token}`
 
         sendMail(reset_info?.email, url)
             .then(() => {
